@@ -1,0 +1,11 @@
+docs/
+*.pyc
+__pycache__/
+venv/
+.env
+*.log
+.DS_Store
+.claude
+AGENTS.md
+CONTEXT.md
+SKILL.md

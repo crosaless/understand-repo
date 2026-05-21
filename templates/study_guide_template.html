@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-lang="{{OUTPUT_LANGUAGE}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PROJECT_NAME}} — Study Guide</title>
+
+  <script>
+    (function () {
+      var s = localStorage.getItem('theme');
+      var sys = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', s || sys);
+      var ac = localStorage.getItem('accentColor');
+      if (ac) document.documentElement.style.setProperty('--accent', ac);
+      var lang = localStorage.getItem('guideLang') || document.documentElement.getAttribute('data-lang') || 'en';
+      document.documentElement.setAttribute('data-lang', lang);
+    })();
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <link rel="stylesheet" id="hljs-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+  <script type="module">
+    try {
+      const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default', securityLevel: 'loose' });
+      await mermaid.run({ querySelector: '.mermaid' });
+      window.__mermaid = mermaid;
+    } catch (e) {
+      document.querySelectorAll('.mermaid').forEach(el => {
+        el.innerHTML = '<em style="opacity:0.45">[Mermaid unavailable offline — see architecture.mmd]</em>';
+      });
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Dark tokens ───────────────────────────────────────── */
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg:             #07070f;
+      --orb-1:          rgba(80, 80, 200, 0.10);
+      --orb-2:          rgba(20,  80, 180, 0.07);
+      --orb-3:          rgba(160, 40, 120, 0.05);
+      --fg:             #eeeef5;
+      --fg-dim:         #88889a;
+      --fg-dimmer:      #44445a;
+      --accent:         #f4f4f8;
+      --accent-2:       #9898b0;
+      --danger:         #f87171;
+      --success:        #4ade80;
+      --badge-type-bg:  rgba(255,255,255,0.08);
+      --badge-type-fg:  var(--fg);
+      --badge-type-bd:  rgba(255,255,255,0.18);
+      --toc-active-bg:  rgba(255,255,255,0.07);
+      --glass-bg:       rgba(255,255,255,0.07);
+      --glass-bg-h:     rgba(255,255,255,0.11);
+      --glass-border:   rgba(255,255,255,0.08);
+      --glass-border-s: rgba(255,255,255,0.15);
+      --glass-hi:       rgba(255,255,255,0.04);
+      --glass-shadow:   0 8px 40px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.04) inset;
+      --code-bg:        rgba(0,0,0,0.45);
+      --inline-bg:      rgba(255,255,255,0.08);
+      --inline-fg:      #e8e8f2;
+      --sb-track:       rgba(255,255,255,0.03);
+      --sb-thumb:       rgba(255,255,255,0.12);
+      --mark-bg:        rgba(244,244,248,0.22);
+    }
+
+    /* ── Light tokens ──────────────────────────────────────── */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg:             #f0f0f9;
+      --orb-1:          rgba(80, 80, 200, 0.05);
+      --orb-2:          rgba(20,  80, 180, 0.04);
+      --orb-3:          rgba(160, 40, 120, 0.03);
+      --fg:             #1a1a2e;
+      --fg-dim:         #66667a;
+      --fg-dimmer:      #aaaacc;
+      --accent:         #09090e;
+      --accent-2:       #50505f;
+      --danger:         #dc2626;
+      --success:        #16a34a;
+      --badge-type-bg:  rgba(0,0,0,0.82);
+      --badge-type-fg:  #ffffff;
+      --badge-type-bd:  transparent;
+      --toc-active-bg:  rgba(0,0,0,0.055);
+      --glass-bg:       rgba(255,255,255,0.62);
+      --glass-bg-h:     rgba(255,255,255,0.82);
+      --glass-border:   rgba(200,200,230,0.5);
+      --glass-border-s: rgba(180,180,220,0.7);
+      --glass-hi:       rgba(255,255,255,0.10);
+      --glass-shadow:   0 8px 40px rgba(60,50,130,0.08), 0 1px 0 rgba(255,255,255,0.8) inset;
+      --code-bg:        rgba(0,0,0,0.04);
+      --inline-bg:      rgba(0,0,0,0.055);
+      --inline-fg:      #111120;
+      --sb-track:       rgba(0,0,0,0.04);
+      --sb-thumb:       rgba(0,0,0,0.14);
+      --mark-bg:        rgba(0,0,0,0.14);
+    }
+
+    /* ── Base ──────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.65;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 12% 42%, var(--orb-1), transparent),
+        radial-gradient(ellipse 55% 65% at 88% 18%, var(--orb-2), transparent),
+        radial-gradient(ellipse 45% 45% at 58% 82%, var(--orb-3), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LiquidGlass ───────────────────────────────────────── */
+    .glass {
+      position: relative;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glass-border-s), transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .glass::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(148deg, var(--glass-hi) 0%, transparent 42%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Bug fix: card content must sit above glass pseudo-elements */
+    .section-header,
+    .section-body { position: relative; z-index: 2; }
+
+    /* ── Progress bar ──────────────────────────────────────── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      z-index: 1000;
+      transition: width 0.1s linear;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* ── Sidebar ───────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 272px;
+      padding: 18px 14px 24px;
+      z-index: 200; overflow-y: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-right: 1px solid var(--glass-border);
+    }
+    nav::before, nav::after { display: none; }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.92rem; font-weight: 700; color: var(--fg);
+      padding: 4px 8px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 10px;
+    }
+    .nav-brand-icon { color: var(--accent); flex-shrink: 0; }
+
+    /* ── Language switcher ─────────────────────────────────── */
+    .lang-switcher {
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 8px 12px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 14px;
+    }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.8px;
+      color: var(--fg-dimmer); padding: 3px 6px; border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      font-family: inherit;
+    }
+    .lang-btn:hover { background: var(--glass-bg-h); color: var(--fg-dim); }
+    .lang-btn.active { background: var(--toc-active-bg); color: var(--accent); }
+    .lang-sep { color: var(--fg-dimmer); font-size: 0.7rem; user-select: none; }
+
+    .toc-heading {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.6px;
+      color: var(--fg-dimmer); padding: 0 8px; margin-bottom: 4px; font-weight: 600;
+    }
+    .toc-list { list-style: none; }
+    .toc-list > li { margin: 1px 0; }
+    .toc-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 8px; border-radius: 10px;
+      color: var(--fg-dim); text-decoration: none; font-size: 0.86rem;
+      transition: background 0.15s, color 0.15s; cursor: pointer; user-select: none;
+    }
+    .toc-link:hover { background: var(--glass-bg-h); color: var(--fg); }
+    .toc-link.active { background: var(--toc-active-bg); color: var(--accent); }
+    .toc-icon { width: 14px; height: 14px; flex-shrink: 0; }
+    .toc-chevron { width: 12px; height: 12px; margin-left: auto; transition: transform 0.2s; flex-shrink: 0; opacity: 0.5; }
+    .toc-link.open .toc-chevron { transform: rotate(90deg); }
+    .toc-sub { list-style: none; padding-left: 20px; overflow: hidden; max-height: 0; transition: max-height 0.28s ease; }
+    .toc-sub.open { max-height: 800px; }
+    .toc-sub li { margin: 1px 0; }
+    .toc-sub li a { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 8px; color: var(--fg-dimmer); text-decoration: none; font-size: 0.8rem; transition: background 0.15s, color 0.15s; }
+    .toc-sub li a:hover { background: var(--glass-bg-h); color: var(--fg-dim); }
+    nav::-webkit-scrollbar { width: 3px; }
+    nav::-webkit-scrollbar-track { background: transparent; }
+    nav::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 2px; }
+
+    /* ── Header ────────────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 272px; right: 0; height: 50px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    #breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--fg-dim); }
+    #breadcrumb-text { color: var(--fg); font-weight: 500; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .search-wrap { position: relative; display: flex; align-items: center; }
+    .search-icon { position: absolute; left: 10px; width: 13px; height: 13px; color: var(--fg-dim); pointer-events: none; z-index: 1; }
+    #search-input {
+      background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px;
+      padding: 5px 14px 5px 32px; color: var(--fg); font-size: 0.82rem; width: 185px; outline: none;
+      transition: width 0.2s, border-color 0.2s;
+    }
+    #search-input::placeholder { color: var(--fg-dim); }
+    #search-input:focus { width: 230px; border-color: var(--accent); }
+
+    /* ── Color picker ──────────────────────────────────────── */
+    .color-picker-wrap { position: relative; }
+    .color-dot-btn {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .color-dot-btn:hover { background: var(--glass-bg-h); }
+    .color-dot-preview {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent);
+      border: 1.5px solid var(--glass-border-s);
+      display: block; transition: background 0.2s;
+    }
+    .color-popover {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      border-radius: 14px; padding: 14px 16px;
+      display: none; flex-direction: column; gap: 10px;
+      width: 170px; z-index: 300;
+    }
+    .color-popover.open { display: flex; }
+    .color-popover::before, .color-popover::after { border-radius: 14px; }
+    .color-popover-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; font-weight: 600; color: var(--fg-dim);
+      position: relative; z-index: 2;
+    }
+    #color-input {
+      width: 100%; height: 36px; border-radius: 8px;
+      border: 1px solid var(--glass-border); cursor: pointer;
+      background: none; padding: 2px;
+      position: relative; z-index: 2;
+    }
+    .color-reset-btn {
+      background: var(--glass-bg-h); border: 1px solid var(--glass-border);
+      border-radius: 8px; padding: 5px 10px; cursor: pointer; color: var(--fg-dim);
+      font-size: 0.76rem; font-family: inherit; transition: color 0.15s;
+      position: relative; z-index: 2;
+    }
+    .color-reset-btn:hover { color: var(--fg); }
+
+    /* ── Theme toggle ──────────────────────────────────────── */
+    #theme-toggle {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      cursor: pointer; color: var(--fg);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; flex-shrink: 0;
+    }
+    #theme-toggle:hover { background: var(--glass-bg-h); }
+
+    /* ── Main ──────────────────────────────────────────────── */
+    main { position: relative; z-index: 1; margin-left: 272px; padding: 68px 48px 80px; max-width: calc(272px + 840px); }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    #hero { padding: 48px 0 36px; }
+    .hero-title {
+      font-size: 2.8rem; font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 18px;
+      background: linear-gradient(135deg, var(--fg) 50%, var(--accent-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--fg-dim); font-size: 0.88rem; }
+
+    /* ── Badges ────────────────────────────────────────────── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; line-height: 1; }
+    .badge-type { background: var(--badge-type-bg); color: var(--badge-type-fg); border: 1px solid var(--badge-type-bd); }
+    .badge-commit { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--fg-dim); font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 0.76rem; }
+    .badge-inferred { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.28); color: var(--danger); font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; font-weight: 500; vertical-align: middle; margin-left: 6px; }
+
+    /* ── Section cards ─────────────────────────────────────── */
+    .section-card { border-radius: 20px; margin-bottom: 16px; overflow: hidden; transition: box-shadow 0.2s; }
+    .section-card:hover { box-shadow: var(--glass-shadow), 0 0 0 1px var(--glass-border-s); }
+    .section-header {
+      display: flex; align-items: center; gap: 11px;
+      padding: 18px 22px; cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--glass-border); transition: background 0.15s;
+    }
+    .section-header:hover { background: var(--glass-bg-h); }
+    .section-icon { color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+    .section-title { font-size: 1.05rem; font-weight: 600; color: var(--fg); flex: 1; }
+    .section-chevron { width: 15px; height: 15px; color: var(--fg-dim); transition: transform 0.25s; flex-shrink: 0; opacity: 0.7; }
+    .section-card.collapsed .section-chevron { transform: rotate(-90deg); }
+    .section-card.collapsed .section-body { display: none; }
+    .section-body { padding: 22px 24px; }
+
+    /* ── Typography ────────────────────────────────────────── */
+    h2 { font-size: 1.3rem; font-weight: 700; color: var(--fg); margin-bottom: 14px; }
+    h3 { font-size: 0.98rem; font-weight: 600; color: var(--fg); margin: 18px 0 8px; }
+    h3:first-child { margin-top: 0; }
+    p { color: var(--fg); margin-bottom: 10px; }
+    p:last-child { margin-bottom: 0; }
+    ul, ol { padding-left: 20px; color: var(--fg); }
+    li { margin: 5px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { color: var(--fg); }
+
+    /* ── Code ──────────────────────────────────────────────── */
+    .code-wrap { position: relative; margin: 10px 0; }
+    pre { background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px 20px; overflow-x: auto; font-size: 0.855rem; line-height: 1.6; }
+    pre code { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+    p code, li code, td code { background: var(--inline-bg); color: var(--inline-fg); padding: 2px 7px; border-radius: 5px; font-size: 0.85em; font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+    .copy-btn { position: absolute; top: 9px; right: 9px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px 9px; cursor: pointer; color: var(--fg-dim); font-size: 0.74rem; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.18s, background 0.15s, color 0.15s; font-family: inherit; }
+    .code-wrap:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { background: var(--glass-bg-h); color: var(--fg); }
+    .copy-btn.copied { color: var(--success); border-color: rgba(74,222,128,0.35); }
+
+    /* ── Table ─────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+    th, td { text-align: left; padding: 9px 13px; border-bottom: 1px solid var(--glass-border); font-size: 0.88rem; }
+    th { color: var(--fg-dim); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.9px; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Mermaid ───────────────────────────────────────────── */
+    .mermaid { background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 28px; text-align: center; min-height: 80px; }
+
+    /* ── Code Deep Dive ────────────────────────────────────── */
+    .code-module { margin-bottom: 28px; }
+    .code-module:last-child { margin-bottom: 0; }
+    .code-module-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .code-module-header h3 { margin: 0; }
+    .module-role { color: var(--fg-dim); font-size: 0.87rem; margin-bottom: 10px; }
+
+    /* ── Extension Points ──────────────────────────────────── */
+    .ext-point { border: 1px solid var(--glass-border); border-radius: 13px; padding: 14px 18px; margin: 8px 0; background: var(--glass-bg); transition: background 0.15s, border-color 0.15s; }
+    .ext-point:hover { background: var(--glass-bg-h); border-color: var(--glass-border-s); }
+    .ext-point-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .ext-point-header h3 { margin: 0; font-size: 0.95rem; }
+    .ext-point p { margin: 0; color: var(--fg-dim); font-size: 0.875rem; }
+
+    /* ── Search ────────────────────────────────────────────── */
+    mark.search-hl { background: var(--mark-bg); color: inherit; border-radius: 2px; padding: 0 1px; }
+    .section-card.search-hidden { display: none; }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--glass-border); color: var(--fg-dimmer); font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+    /* ── Scrollbar ─────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--sb-track); }
+    ::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 3px; }
+
+    /* ── Mobile ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { position: static; width: 100%; border-right: none; border-bottom: 1px solid var(--glass-border); }
+      header { left: 0; }
+      main { margin-left: 0; padding: 68px 20px 48px; }
+      .hero-title { font-size: 2rem; }
+      #search-input { width: 130px; }
+      #search-input:focus { width: 170px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<nav>
+  <div class="nav-brand">
+    <i data-lucide="book-open" class="nav-brand-icon" style="width:15px;height:15px"></i>
+    {{PROJECT_NAME}}
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn" data-lang="en">EN</button>
+    <span class="lang-sep">|</span>
+    <button class="lang-btn" data-lang="es">ES</button>
+  </div>
+  <p class="toc-heading" data-i18n="contents">Contents</p>
+  <ul class="toc-list" id="toc"></ul>
+</nav>
+
+<header>
+  <div id="breadcrumb">
+    <i data-lucide="map-pin" style="width:13px;height:13px;color:var(--fg-dim)"></i>
+    <span id="breadcrumb-text">Overview</span>
+  </div>
+  <div class="header-right">
+    <div class="search-wrap">
+      <i data-lucide="search" class="search-icon"></i>
+      <input type="search" id="search-input" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="color-picker-wrap">
+      <button class="color-dot-btn" id="color-trigger" title="Accent color" aria-label="Customize accent color">
+        <span class="color-dot-preview" id="color-dot-preview"></span>
+      </button>
+      <div class="color-popover glass" id="color-popover">
+        <div class="color-popover-label">
+          <i data-lucide="palette" style="width:13px;height:13px"></i>
+          <span data-i18n="accentColor">Accent</span>
+        </div>
+        <input type="color" id="color-input">
+        <button class="color-reset-btn" id="color-reset" data-i18n="reset">Reset</button>
+      </div>
+    </div>
+    <button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+      <i data-lucide="sun"  id="theme-icon-light" style="width:15px;height:15px;display:none"></i>
+      <i data-lucide="moon" id="theme-icon-dark"  style="width:15px;height:15px"></i>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section id="hero">
+    <h1 class="hero-title">{{PROJECT_NAME}}</h1>
+    <div class="hero-meta">
+      <span class="badge badge-type">
+        <i data-lucide="layers" style="width:11px;height:11px"></i>
+        {{PROJECT_TYPE}}
+      </span>
+      <span class="badge badge-commit">
+        <i data-lucide="git-commit-horizontal" style="width:11px;height:11px"></i>
+        {{COMMIT_HASH}}
+      </span>
+      <span><span data-i18n="generated">Generated</span> {{GENERATED_AT}}</span>
+    </div>
+  </section>
+
+  <div class="section-card glass" id="what-and-why">
+    <div class="section-header">
+      <i data-lucide="lightbulb" class="section-icon"></i>
+      <span class="section-title" data-i18n="whatAndWhy">What &amp; Why</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">{{WHAT_AND_WHY}}</div>
+  </div>
+
+  <div class="section-card glass" id="architecture">
+    <div class="section-header">
+      <i data-lucide="git-fork" class="section-icon"></i>
+      <span class="section-title" data-i18n="architecture">Architecture</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">
+      <div class="mermaid">
+{{MERMAID_DIAGRAM}}
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card glass" id="how-it-works">
+    <div class="section-header">
+      <i data-lucide="workflow" class="section-icon"></i>
+      <span class="section-title" data-i18n="howItWorks">How it works</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">{{HOW_IT_WORKS}}</div>
+  </div>
+
+  <div class="section-card glass" id="key-files">
+    <div class="section-header">
+      <i data-lucide="files" class="section-icon"></i>
+      <span class="section-title" data-i18n="keyFiles">Key Files</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th data-i18n="file">File</th><th data-i18n="role">Role</th></tr></thead>
+        <tbody id="key-files-tbody">{{KEY_FILES_ROWS}}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-card glass" id="code-deep-dive">
+    <div class="section-header">
+      <i data-lucide="code-2" class="section-icon"></i>
+      <span class="section-title" data-i18n="codeDeepDive">Code Deep Dive</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">{{CODE_DEEP_DIVE_BLOCKS}}</div>
+  </div>
+
+  <div class="section-card glass" id="extension-points">
+    <div class="section-header">
+      <i data-lucide="plug" class="section-icon"></i>
+      <span class="section-title" data-i18n="extensionPoints">Extension Points</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">{{EXTENSION_POINTS_LIST}}</div>
+  </div>
+
+  <div class="section-card glass" id="try-it-now">
+    <div class="section-header">
+      <i data-lucide="play-circle" class="section-icon"></i>
+      <span class="section-title" data-i18n="tryItNow">Try it now</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">
+      <h3 data-i18n="minimalExample">Minimal example</h3>
+      <div class="code-wrap">
+        <pre><code>{{MINIMAL_EXAMPLE}}</code></pre>
+        <button class="copy-btn"><i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">Copy</span></button>
+      </div>
+      <h3 data-i18n="localSetup">Local setup</h3>
+      <div class="code-wrap">
+        <pre><code>{{LOCAL_SETUP}}</code></pre>
+        <button class="copy-btn"><i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">Copy</span></button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span><span data-i18n="generatedBy">Generated by</span> <a href="https://github.com/crosaless/repo-study-guide">understand-repo</a></span>
+    <span>{{GENERATED_AT}}</span>
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── i18n ───────────────────────────────────────────────── */
+  const LANGS = {
+    en: {
+      contents:      'Contents',
+      whatAndWhy:    'What & Why',
+      architecture:  'Architecture',
+      howItWorks:    'How it works',
+      keyFiles:      'Key Files',
+      codeDeepDive:  'Code Deep Dive',
+      extensionPoints: 'Extension Points',
+      tryItNow:      'Try it now',
+      file:          'File',
+      role:          'Role',
+      minimalExample:'Minimal example',
+      localSetup:    'Local setup',
+      copy:          'Copy',
+      copied:        'Copied',
+      generated:     'Generated',
+      generatedBy:   'Generated by',
+      accentColor:   'Accent',
+      reset:         'Reset',
+      toc: {
+        hero:             'Overview',
+        'what-and-why':   'What & Why',
+        architecture:     'Architecture',
+        'how-it-works':   'How it works',
+        'key-files':      'Key Files',
+        'code-deep-dive': 'Code Deep Dive',
+        'extension-points': 'Extension Points',
+        'try-it-now':     'Try it now',
+      }
+    },
+    es: {
+      contents:      'Contenido',
+      whatAndWhy:    'Qué y Por Qué',
+      architecture:  'Arquitectura',
+      howItWorks:    'Cómo funciona',
+      keyFiles:      'Archivos clave',
+      codeDeepDive:  'Código en profundidad',
+      extensionPoints: 'Puntos de extensión',
+      tryItNow:      'Probalo ahora',
+      file:          'Archivo',
+      role:          'Rol',
+      minimalExample:'Ejemplo mínimo',
+      localSetup:    'Setup local',
+      copy:          'Copiar',
+      copied:        'Copiado',
+      generated:     'Generado',
+      generatedBy:   'Generado por',
+      accentColor:   'Acento',
+      reset:         'Restablecer',
+      toc: {
+        hero:             'Resumen',
+        'what-and-why':   'Qué y Por Qué',
+        architecture:     'Arquitectura',
+        'how-it-works':   'Cómo funciona',
+        'key-files':      'Archivos clave',
+        'code-deep-dive': 'Código en profundidad',
+        'extension-points': 'Puntos de extensión',
+        'try-it-now':     'Probalo ahora',
+      }
+    }
+  };
+
+  let currentLang = document.documentElement.getAttribute('data-lang') || 'en';
+
+  function applyLang(lang) {
+    if (!LANGS[lang]) return;
+    currentLang = lang;
+    document.documentElement.setAttribute('data-lang', lang);
+    localStorage.setItem('guideLang', lang);
+    const t = LANGS[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] != null) el.textContent = t[key];
+    });
+    document.querySelectorAll('.toc-link[data-sid]').forEach(link => {
+      const sid = link.dataset.sid;
+      const label = t.toc[sid];
+      if (label) {
+        const span = link.querySelector('span');
+        if (span) span.textContent = label;
+      }
+    });
+    const breadText = document.getElementById('breadcrumb-text');
+    const active = document.querySelector('.toc-link.active');
+    if (active && breadText) breadText.textContent = t.toc[active.dataset.sid] || breadText.textContent;
+    document.querySelectorAll('.section-title[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+    const si = document.getElementById('search-input');
+    if (si) si.placeholder = lang === 'es' ? 'Buscar en la guía…' : 'Search guide…';
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
+  applyLang(currentLang);
+
+  /* ── Theme ──────────────────────────────────────────────── */
+  const root      = document.documentElement;
+  const iconLight = document.getElementById('theme-icon-light');
+  const iconDark  = document.getElementById('theme-icon-dark');
+  const hljsTheme = document.getElementById('hljs-theme');
+
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    iconLight.style.display = t === 'light' ? 'block' : 'none';
+    iconDark.style.display  = t === 'dark'  ? 'block' : 'none';
+    if (hljsTheme) hljsTheme.href = t === 'light'
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css'
+      : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+    updateColorDot();
+  }
+  const savedTheme = localStorage.getItem('theme');
+  const sysTheme   = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  applyTheme(savedTheme || sysTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ── Color picker ───────────────────────────────────────── */
+  const colorTrigger = document.getElementById('color-trigger');
+  const colorPopover = document.getElementById('color-popover');
+  const colorInput   = document.getElementById('color-input');
+  const colorDot     = document.getElementById('color-dot-preview');
+  const colorReset   = document.getElementById('color-reset');
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return { r, g, b };
+  }
+
+  function setCustomAccent(hex) {
+    root.style.setProperty('--accent', hex);
+    const { r, g, b } = hexToRgb(hex);
+    const r2 = Math.round(r * 0.6 + 100 * 0.4);
+    const g2 = Math.round(g * 0.6 + 100 * 0.4);
+    const b2 = Math.round(b * 0.6 + 110 * 0.4);
+    root.style.setProperty('--accent-2', `rgb(${r2},${g2},${b2})`);
+    localStorage.setItem('accentColor', hex);
+    updateColorDot();
+  }
+
+  function updateColorDot() {
+    const c = getComputedStyle(root).getPropertyValue('--accent').trim();
+    if (colorDot) colorDot.style.background = c;
+    if (colorInput) {
+      const stored = localStorage.getItem('accentColor');
+      if (stored) colorInput.value = stored;
+    }
+  }
+
+  function resetAccent() {
+    root.style.removeProperty('--accent');
+    root.style.removeProperty('--accent-2');
+    localStorage.removeItem('accentColor');
+    setTimeout(updateColorDot, 10);
+  }
+
+  const savedAccent = localStorage.getItem('accentColor');
+  if (savedAccent) { root.style.setProperty('--accent', savedAccent); }
+  updateColorDot();
+
+  colorTrigger?.addEventListener('click', e => {
+    e.stopPropagation();
+    colorPopover.classList.toggle('open');
+    if (window.lucide) lucide.createIcons({ nodes: [colorPopover] });
+  });
+  document.addEventListener('click', e => {
+    if (!colorTrigger?.contains(e.target) && !colorPopover?.contains(e.target)) {
+      colorPopover?.classList.remove('open');
+    }
+  });
+  colorInput?.addEventListener('input', () => setCustomAccent(colorInput.value));
+  colorReset?.addEventListener('click', () => { resetAccent(); colorPopover?.classList.remove('open'); });
+
+  /* ── Progress bar ───────────────────────────────────────── */
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = max > 0 ? (window.scrollY / max * 100) + '%' : '100%';
+  }, { passive: true });
+
+  /* ── TOC ────────────────────────────────────────────────── */
+  const TOC_DEFS = [
+    { id: 'hero',             icon: 'home'          },
+    { id: 'what-and-why',     icon: 'lightbulb'     },
+    { id: 'architecture',     icon: 'git-fork'      },
+    { id: 'how-it-works',     icon: 'workflow'      },
+    { id: 'key-files',        icon: 'files',        subs: { sel: '#key-files-tbody tr', label: r => r.querySelector('td')?.textContent?.trim() } },
+    { id: 'code-deep-dive',   icon: 'code-2',       subs: { sel: '.code-module',        label: m => m.querySelector('h3')?.textContent?.trim() } },
+    { id: 'extension-points', icon: 'plug'          },
+    { id: 'try-it-now',       icon: 'play-circle'   },
+  ];
+
+  const tocEl      = document.getElementById('toc');
+  const breadcrumb = document.getElementById('breadcrumb-text');
+
+  TOC_DEFS.forEach(def => {
+    const li = document.createElement('li');
+    const a  = document.createElement('a');
+    a.className = 'toc-link'; a.dataset.sid = def.id; a.href = '#' + def.id;
+    const t = LANGS[currentLang];
+    a.innerHTML = `<i data-lucide="${def.icon}" class="toc-icon"></i><span>${t.toc[def.id] || def.id}</span>`;
+
+    if (def.subs) {
+      const chev = document.createElement('i');
+      chev.setAttribute('data-lucide', 'chevron-right'); chev.className = 'toc-chevron';
+      a.appendChild(chev);
+      const sub = document.createElement('ul'); sub.className = 'toc-sub';
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById(def.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        a.classList.toggle('open'); sub.classList.toggle('open');
+      });
+      setTimeout(() => {
+        document.querySelectorAll(def.subs.sel).forEach((el, i) => {
+          const lbl = def.subs.label(el); if (!lbl) return;
+          const slug = el.id || (def.id + '-sub-' + i); if (!el.id) el.id = slug;
+          const sli = document.createElement('li'); const sa = document.createElement('a');
+          sa.href = '#' + slug;
+          sa.innerHTML = `<i data-lucide="file-code-2" style="width:11px;height:11px"></i>${lbl}`;
+          sli.appendChild(sa); sub.appendChild(sli);
+        });
+        if (window.lucide) lucide.createIcons({ nodes: [sub] });
+      }, 300);
+      li.appendChild(a); li.appendChild(sub);
+    } else {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById(def.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+    }
+    tocEl.appendChild(li);
+  });
+
+  /* ── Scrollspy ──────────────────────────────────────────── */
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const id = e.target.id;
+      document.querySelectorAll('.toc-link').forEach(l => l.classList.toggle('active', l.dataset.sid === id));
+      const t = LANGS[currentLang];
+      if (breadcrumb && t.toc[id]) breadcrumb.textContent = t.toc[id];
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  TOC_DEFS.map(d => document.getElementById(d.id)).filter(Boolean).forEach(s => spy.observe(s));
+
+  /* ── Collapsible ────────────────────────────────────────── */
+  document.querySelectorAll('.section-header').forEach(hdr => {
+    hdr.addEventListener('click', () => hdr.closest('.section-card')?.classList.toggle('collapsed'));
+  });
+
+  /* ── Copy to clipboard ──────────────────────────────────── */
+  function wireBtn(btn) {
+    const pre = btn.closest('.code-wrap')?.querySelector('pre'); if (!pre) return;
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(pre.textContent || '').then(() => {
+        btn.classList.add('copied');
+        const span = btn.querySelector('[data-i18n="copy"]');
+        const orig = span?.textContent;
+        if (span) span.textContent = LANGS[currentLang].copied;
+        btn.querySelector('i')?.setAttribute('data-lucide', 'check');
+        if (window.lucide) lucide.createIcons({ nodes: [btn] });
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (span) span.textContent = LANGS[currentLang].copy;
+          btn.querySelector('i')?.setAttribute('data-lucide', 'copy');
+          if (window.lucide) lucide.createIcons({ nodes: [btn] });
+        }, 2000);
+      });
+    });
+  }
+  document.querySelectorAll('pre').forEach(pre => {
+    if (pre.closest('.code-wrap')) { wireBtn(pre.closest('.code-wrap').querySelector('.copy-btn')); return; }
+    const wrap = document.createElement('div'); wrap.className = 'code-wrap';
+    pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+    const btn = document.createElement('button'); btn.className = 'copy-btn';
+    btn.innerHTML = `<i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">${LANGS[currentLang].copy}</span>`;
+    wrap.appendChild(btn); wireBtn(btn);
+  });
+
+  /* ── Search ─────────────────────────────────────────────── */
+  const searchEl = document.getElementById('search-input');
+  searchEl?.addEventListener('input', () => {
+    const q = searchEl.value.trim().toLowerCase();
+    document.querySelectorAll('mark.search-hl').forEach(m => m.replaceWith(document.createTextNode(m.textContent)));
+    document.querySelectorAll('.section-card').forEach(card => {
+      if (!q) { card.classList.remove('search-hidden', 'collapsed'); return; }
+      card.classList.toggle('search-hidden', !card.textContent.toLowerCase().includes(q));
+      if (!card.classList.contains('search-hidden')) card.classList.remove('collapsed');
+    });
+  });
+
+  /* ── Init ───────────────────────────────────────────────── */
+  window.addEventListener('load', () => {
+    if (window.hljs) document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    if (window.lucide) lucide.createIcons();
+    updateColorDot();
+  });
+})();
+</script>
+</body>
+</html>
