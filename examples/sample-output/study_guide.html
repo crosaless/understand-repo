@@ -1,178 +1,976 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>sample-cli — Study Guide</title>
+  <title>understand-repo — Study Guide</title>
 
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css">
-  <script defer
-          src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script>
+    (function () {
+      var s = localStorage.getItem('theme');
+      var sys = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', s || sys);
+      var ac = localStorage.getItem('accentColor');
+      if (ac) document.documentElement.style.setProperty('--accent', ac);
+      var lang = localStorage.getItem('guideLang') || document.documentElement.getAttribute('data-lang') || 'en';
+      document.documentElement.setAttribute('data-lang', lang);
+    })();
+  </script>
 
+  <script>
+  /* Lucide icons — inline subset (no CDN required) */
+  (function(){
+    var I={
+      'book-open':'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+      'map-pin':'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+      'search':'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+      'palette':'<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+      'sun':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+      'moon':'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+      'home':'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+      'lightbulb':'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+      'git-fork':'<circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"/><path d="M12 12v3"/>',
+      'workflow':'<rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/>',
+      'files':'<path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z"/><path d="M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8"/>',
+      'code-2':'<path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>',
+      'plug':'<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
+      'play-circle':'<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+      'layers':'<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+      'git-commit-horizontal':'<circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/>',
+      'chevron-down':'<path d="m6 9 6 6 6-6"/>',
+      'chevron-right':'<path d="m9 18 6-6-6-6"/>',
+      'copy':'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+      'check':'<path d="M20 6 9 17l-5-5"/>',
+      'file-code-2':'<path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m5 12-3 3 3 3"/><path d="m11 18 3-3-3-3"/>',
+      'plug-2':'<path d="M9 2v6"/><path d="M15 2v6"/><path d="M12 17v5"/><path d="M5 8h14"/><path d="M6 11V8h12v3a6 6 0 1 1-12 0"/>'
+    };
+    function ci(opts){
+      var roots=(opts&&opts.nodes)?[].concat(opts.nodes):[document];
+      roots.forEach(function(root){
+        var els=root===document?root.querySelectorAll('[data-lucide]'):root.querySelectorAll('[data-lucide]');
+        els.forEach(function(el){
+          var name=el.getAttribute('data-lucide'),paths=I[name];
+          if(!paths)return;
+          var ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
+          svg.setAttribute('xmlns',ns);
+          svg.setAttribute('width',el.style.width||'24');
+          svg.setAttribute('height',el.style.height||'24');
+          svg.setAttribute('viewBox','0 0 24 24');
+          svg.setAttribute('fill','none');
+          svg.setAttribute('stroke','currentColor');
+          svg.setAttribute('stroke-width','2');
+          svg.setAttribute('stroke-linecap','round');
+          svg.setAttribute('stroke-linejoin','round');
+          var cls=el.getAttribute('class');if(cls)svg.setAttribute('class',cls);
+          var sty=el.getAttribute('style');if(sty)svg.setAttribute('style',sty);
+          svg.innerHTML=paths;
+          el.parentNode.replaceChild(svg,el);
+        });
+      });
+    }
+    window.lucide={createIcons:ci};
+  })();
+  </script>
+  <link rel="stylesheet" id="hljs-theme"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
   <script type="module">
     try {
-      const mermaid = (await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs')).default;
-      mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+      const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default', securityLevel: 'loose' });
       await mermaid.run({ querySelector: '.mermaid' });
+      window.__mermaid = mermaid;
     } catch (e) {
-      console.error('Mermaid failed:', e);
       document.querySelectorAll('.mermaid').forEach(el => {
-        el.innerHTML = '<em style="color:#888">[Mermaid unavailable offline — see architecture.mmd]</em>';
+        el.innerHTML = '<em style="opacity:0.45">[Mermaid unavailable offline — see architecture.mmd]</em>';
       });
     }
   </script>
 
   <style>
-    :root {
-      --bg: #0e1116; --bg-elev: #161b22; --bg-code: #1e1e1e;
-      --fg: #e6e6e6; --fg-dim: #9aa4b2; --accent: #58a6ff; --border: #30363d;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Dark tokens ───────────────────────────────────────── */
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg:             #07070f;
+      --orb-1:          rgba(80, 80, 200, 0.10);
+      --orb-2:          rgba(20,  80, 180, 0.07);
+      --orb-3:          rgba(160, 40, 120, 0.05);
+      --fg:             #eeeef5;
+      --fg-dim:         #88889a;
+      --fg-dimmer:      #44445a;
+      --accent:         #f4f4f8;
+      --accent-2:       #9898b0;
+      --danger:         #f87171;
+      --success:        #4ade80;
+      --badge-type-bg:  rgba(255,255,255,0.08);
+      --badge-type-fg:  var(--fg);
+      --badge-type-bd:  rgba(255,255,255,0.18);
+      --toc-active-bg:  rgba(255,255,255,0.07);
+      --glass-bg:       rgba(255,255,255,0.07);
+      --glass-bg-h:     rgba(255,255,255,0.11);
+      --glass-border:   rgba(255,255,255,0.08);
+      --glass-border-s: rgba(255,255,255,0.15);
+      --glass-hi:       rgba(255,255,255,0.04);
+      --glass-shadow:   0 8px 40px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.04) inset;
+      --code-bg:        rgba(0,0,0,0.45);
+      --inline-bg:      rgba(255,255,255,0.08);
+      --inline-fg:      #e8e8f2;
+      --sb-track:       rgba(255,255,255,0.03);
+      --sb-thumb:       rgba(255,255,255,0.12);
+      --mark-bg:        rgba(244,244,248,0.22);
     }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-           background: var(--bg); color: var(--fg); line-height: 1.6; }
-    nav { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; padding: 24px 20px;
-          background: var(--bg-elev); border-right: 1px solid var(--border); overflow-y: auto; }
-    nav h2 { margin-top: 0; font-size: 0.85rem; text-transform: uppercase; color: var(--fg-dim); letter-spacing: 1px; }
-    nav ul { list-style: none; padding: 0; margin: 0; }
-    nav li { margin: 8px 0; }
-    nav a { color: var(--fg); text-decoration: none; font-size: 0.95rem; display: block; padding: 6px 10px; border-radius: 4px; }
-    nav a:hover, nav a.active { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
-    main { margin-left: 260px; padding: 40px 48px; max-width: 960px; }
-    h1, h2, h3 { color: #fff; line-height: 1.3; }
-    h1 { font-size: 2.2rem; margin-bottom: 8px; }
-    h2 { font-size: 1.5rem; margin-top: 48px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-    .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: var(--accent);
-             color: #fff; font-size: 0.8rem; font-weight: 600; margin-right: 8px; }
-    .meta { color: var(--fg-dim); font-size: 0.9rem; margin-bottom: 24px; }
-    pre { background: var(--bg-code); padding: 16px; border-radius: 6px; overflow-x: auto; border: 1px solid var(--border); }
-    code { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 0.9rem; }
-    p code, li code, td code { background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: #ffa657; }
-    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    th { color: var(--fg-dim); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
-    .mermaid { background: var(--bg-elev); padding: 24px; border-radius: 6px; border: 1px solid var(--border); text-align: center; }
-    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--fg-dim); font-size: 0.85rem; }
+
+    /* ── Light tokens ──────────────────────────────────────── */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg:             #f0f0f9;
+      --orb-1:          rgba(80, 80, 200, 0.05);
+      --orb-2:          rgba(20,  80, 180, 0.04);
+      --orb-3:          rgba(160, 40, 120, 0.03);
+      --fg:             #1a1a2e;
+      --fg-dim:         #66667a;
+      --fg-dimmer:      #aaaacc;
+      --accent:         #09090e;
+      --accent-2:       #50505f;
+      --danger:         #dc2626;
+      --success:        #16a34a;
+      --badge-type-bg:  rgba(0,0,0,0.82);
+      --badge-type-fg:  #ffffff;
+      --badge-type-bd:  transparent;
+      --toc-active-bg:  rgba(0,0,0,0.055);
+      --glass-bg:       rgba(255,255,255,0.62);
+      --glass-bg-h:     rgba(255,255,255,0.82);
+      --glass-border:   rgba(200,200,230,0.5);
+      --glass-border-s: rgba(180,180,220,0.7);
+      --glass-hi:       rgba(255,255,255,0.10);
+      --glass-shadow:   0 8px 40px rgba(60,50,130,0.08), 0 1px 0 rgba(255,255,255,0.8) inset;
+      --code-bg:        rgba(0,0,0,0.04);
+      --inline-bg:      rgba(0,0,0,0.055);
+      --inline-fg:      #111120;
+      --sb-track:       rgba(0,0,0,0.04);
+      --sb-thumb:       rgba(0,0,0,0.14);
+      --mark-bg:        rgba(0,0,0,0.14);
+    }
+
+    /* ── Base ──────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.65;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 12% 42%, var(--orb-1), transparent),
+        radial-gradient(ellipse 55% 65% at 88% 18%, var(--orb-2), transparent),
+        radial-gradient(ellipse 45% 45% at 58% 82%, var(--orb-3), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LiquidGlass ───────────────────────────────────────── */
+    .glass {
+      position: relative;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glass-border-s), transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .glass::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(148deg, var(--glass-hi) 0%, transparent 42%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Bug fix: card content must sit above glass pseudo-elements */
+    .section-header,
+    .section-body { position: relative; z-index: 2; }
+
+    /* ── Progress bar ──────────────────────────────────────── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      z-index: 1000;
+      transition: width 0.1s linear;
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* ── Sidebar ───────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 272px;
+      padding: 18px 14px 24px;
+      z-index: 200; overflow-y: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-right: 1px solid var(--glass-border);
+    }
+    nav::before, nav::after { display: none; }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.92rem; font-weight: 700; color: var(--fg);
+      padding: 4px 8px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 10px;
+    }
+    .nav-brand-icon { color: var(--accent); flex-shrink: 0; }
+
+    /* ── Language switcher ─────────────────────────────────── */
+    .lang-switcher {
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 8px 12px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 14px;
+    }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.8px;
+      color: var(--fg-dimmer); padding: 3px 6px; border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      font-family: inherit;
+    }
+    .lang-btn:hover { background: var(--glass-bg-h); color: var(--fg-dim); }
+    .lang-btn.active { background: var(--toc-active-bg); color: var(--accent); }
+    .lang-sep { color: var(--fg-dimmer); font-size: 0.7rem; user-select: none; }
+
+    .toc-heading {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.6px;
+      color: var(--fg-dimmer); padding: 0 8px; margin-bottom: 4px; font-weight: 600;
+    }
+    .toc-list { list-style: none; }
+    .toc-list > li { margin: 1px 0; }
+    .toc-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 8px; border-radius: 10px;
+      color: var(--fg-dim); text-decoration: none; font-size: 0.86rem;
+      transition: background 0.15s, color 0.15s; cursor: pointer; user-select: none;
+    }
+    .toc-link:hover { background: var(--glass-bg-h); color: var(--fg); }
+    .toc-link.active { background: var(--toc-active-bg); color: var(--accent); }
+    .toc-icon { width: 14px; height: 14px; flex-shrink: 0; }
+    .toc-chevron { width: 12px; height: 12px; margin-left: auto; transition: transform 0.2s; flex-shrink: 0; opacity: 0.5; }
+    .toc-link.open .toc-chevron { transform: rotate(90deg); }
+    .toc-sub { list-style: none; padding-left: 20px; overflow: hidden; max-height: 0; transition: max-height 0.28s ease; }
+    .toc-sub.open { max-height: 800px; }
+    .toc-sub li { margin: 1px 0; }
+    .toc-sub li a { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 8px; color: var(--fg-dimmer); text-decoration: none; font-size: 0.8rem; transition: background 0.15s, color 0.15s; }
+    .toc-sub li a:hover { background: var(--glass-bg-h); color: var(--fg-dim); }
+    nav::-webkit-scrollbar { width: 3px; }
+    nav::-webkit-scrollbar-track { background: transparent; }
+    nav::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 2px; }
+
+    /* ── Header ────────────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 272px; right: 0; height: 50px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    #breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--fg-dim); }
+    #breadcrumb-text { color: var(--fg); font-weight: 500; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .search-wrap { position: relative; display: flex; align-items: center; }
+    .search-icon { position: absolute; left: 10px; width: 13px; height: 13px; color: var(--fg-dim); pointer-events: none; z-index: 1; }
+    #search-input {
+      background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px;
+      padding: 5px 14px 5px 32px; color: var(--fg); font-size: 0.82rem; width: 185px; outline: none;
+      transition: width 0.2s, border-color 0.2s;
+    }
+    #search-input::placeholder { color: var(--fg-dim); }
+    #search-input:focus { width: 230px; border-color: var(--accent); }
+
+    /* ── Color picker ──────────────────────────────────────── */
+    .color-picker-wrap { position: relative; }
+    .color-dot-btn {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .color-dot-btn:hover { background: var(--glass-bg-h); }
+    .color-dot-preview {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent);
+      border: 1.5px solid var(--glass-border-s);
+      display: block; transition: background 0.2s;
+    }
+    .color-popover {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      border-radius: 14px; padding: 14px 16px;
+      display: none; flex-direction: column; gap: 10px;
+      width: 170px; z-index: 300;
+    }
+    .color-popover.open { display: flex; }
+    .color-popover::before, .color-popover::after { border-radius: 14px; }
+    .color-popover-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; font-weight: 600; color: var(--fg-dim);
+      position: relative; z-index: 2;
+    }
+    #color-input {
+      width: 100%; height: 36px; border-radius: 8px;
+      border: 1px solid var(--glass-border); cursor: pointer;
+      background: none; padding: 2px;
+      position: relative; z-index: 2;
+    }
+    .color-reset-btn {
+      background: var(--glass-bg-h); border: 1px solid var(--glass-border);
+      border-radius: 8px; padding: 5px 10px; cursor: pointer; color: var(--fg-dim);
+      font-size: 0.76rem; font-family: inherit; transition: color 0.15s;
+      position: relative; z-index: 2;
+    }
+    .color-reset-btn:hover { color: var(--fg); }
+
+    /* ── Theme toggle ──────────────────────────────────────── */
+    #theme-toggle {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      cursor: pointer; color: var(--fg);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; flex-shrink: 0;
+    }
+    #theme-toggle:hover { background: var(--glass-bg-h); }
+
+    /* ── Main ──────────────────────────────────────────────── */
+    main { position: relative; z-index: 1; margin-left: 272px; padding: 68px 48px 80px; max-width: calc(272px + 840px); }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    #hero { padding: 48px 0 36px; }
+    .hero-title {
+      font-size: 2.8rem; font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 18px;
+      background: linear-gradient(135deg, var(--fg) 50%, var(--accent-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--fg-dim); font-size: 0.88rem; }
+
+    /* ── Badges ────────────────────────────────────────────── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; line-height: 1; }
+    .badge-type { background: var(--badge-type-bg); color: var(--badge-type-fg); border: 1px solid var(--badge-type-bd); }
+    .badge-commit { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--fg-dim); font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 0.76rem; }
+    .badge-inferred { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.28); color: var(--danger); font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; font-weight: 500; vertical-align: middle; margin-left: 6px; }
+
+    /* ── Section cards ─────────────────────────────────────── */
+    .section-card { border-radius: 20px; margin-bottom: 16px; overflow: hidden; transition: box-shadow 0.2s; }
+    .section-card:hover { box-shadow: var(--glass-shadow), 0 0 0 1px var(--glass-border-s); }
+    .section-header {
+      display: flex; align-items: center; gap: 11px;
+      padding: 18px 22px; cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--glass-border); transition: background 0.15s;
+    }
+    .section-header:hover { background: var(--glass-bg-h); }
+    .section-icon { color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+    .section-title { font-size: 1.05rem; font-weight: 600; color: var(--fg); flex: 1; }
+    .section-chevron { width: 15px; height: 15px; color: var(--fg-dim); transition: transform 0.25s; flex-shrink: 0; opacity: 0.7; }
+    .section-card.collapsed .section-chevron { transform: rotate(-90deg); }
+    .section-card.collapsed .section-body { display: none; }
+    .section-body { padding: 22px 24px; }
+
+    /* ── Typography ────────────────────────────────────────── */
+    h2 { font-size: 1.3rem; font-weight: 700; color: var(--fg); margin-bottom: 14px; }
+    h3 { font-size: 0.98rem; font-weight: 600; color: var(--fg); margin: 18px 0 8px; }
+    h3:first-child { margin-top: 0; }
+    p { color: var(--fg); margin-bottom: 10px; }
+    p:last-child { margin-bottom: 0; }
+    ul, ol { padding-left: 20px; color: var(--fg); }
+    li { margin: 5px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { color: var(--fg); }
+
+    /* ── Code ──────────────────────────────────────────────── */
+    .code-wrap { position: relative; margin: 10px 0; }
+    pre { background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px 20px; overflow-x: auto; font-size: 0.855rem; line-height: 1.6; }
+    pre code { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+    p code, li code, td code { background: var(--inline-bg); color: var(--inline-fg); padding: 2px 7px; border-radius: 5px; font-size: 0.85em; font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+    .copy-btn { position: absolute; top: 9px; right: 9px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 4px 9px; cursor: pointer; color: var(--fg-dim); font-size: 0.74rem; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.18s, background 0.15s, color 0.15s; font-family: inherit; }
+    .code-wrap:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { background: var(--glass-bg-h); color: var(--fg); }
+    .copy-btn.copied { color: var(--success); border-color: rgba(74,222,128,0.35); }
+
+    /* ── Table ─────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+    th, td { text-align: left; padding: 9px 13px; border-bottom: 1px solid var(--glass-border); font-size: 0.88rem; }
+    th { color: var(--fg-dim); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.9px; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Mermaid ───────────────────────────────────────────── */
+    .mermaid { background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 28px; text-align: center; min-height: 80px; }
+
+    /* ── Code Deep Dive ────────────────────────────────────── */
+    .code-module { margin-bottom: 28px; }
+    .code-module:last-child { margin-bottom: 0; }
+    .code-module-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .code-module-header h3 { margin: 0; }
+    .module-role { color: var(--fg-dim); font-size: 0.87rem; margin-bottom: 10px; }
+
+    /* ── Extension Points ──────────────────────────────────── */
+    .ext-point { border: 1px solid var(--glass-border); border-radius: 13px; padding: 14px 18px; margin: 8px 0; background: var(--glass-bg); transition: background 0.15s, border-color 0.15s; }
+    .ext-point:hover { background: var(--glass-bg-h); border-color: var(--glass-border-s); }
+    .ext-point-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .ext-point-header h3 { margin: 0; font-size: 0.95rem; }
+    .ext-point p { margin: 0; color: var(--fg-dim); font-size: 0.875rem; }
+
+    /* ── Search ────────────────────────────────────────────── */
+    mark.search-hl { background: var(--mark-bg); color: inherit; border-radius: 2px; padding: 0 1px; }
+    .section-card.search-hidden { display: none; }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--glass-border); color: var(--fg-dimmer); font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+    /* ── Scrollbar ─────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--sb-track); }
+    ::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 3px; }
+
+    /* ── Mobile ────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      nav { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-      main { margin-left: 0; padding: 24px 20px; }
+      nav { position: static; width: 100%; border-right: none; border-bottom: 1px solid var(--glass-border); }
+      header { left: 0; }
+      main { margin-left: 0; padding: 68px 20px 48px; }
+      .hero-title { font-size: 2rem; }
+      #search-input { width: 130px; }
+      #search-input:focus { width: 170px; }
     }
   </style>
 </head>
 <body>
-  <nav>
-    <h2>Contents</h2>
-    <ul id="toc"></ul>
-  </nav>
 
-  <main>
-    <h1>sample-cli</h1>
-    <p class="meta"><span class="badge">CLI Tool</span> Generated 2026-05-17 · commit <code>a1b2c3d</code></p>
+<div id="progress-bar"></div>
 
-    <section id="overview">
-      <h2>Overview</h2>
-      <p>sample-cli is a small Python command-line tool that fetches JSON from public APIs, normalizes it, and stores it in a local SQLite database for later reporting.</p>
-    </section>
+<nav>
+  <div class="nav-brand">
+    <i data-lucide="book-open" class="nav-brand-icon" style="width:15px;height:15px"></i>
+    understand-repo
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn" data-lang="en">EN</button>
+    <span class="lang-sep">|</span>
+    <button class="lang-btn" data-lang="es">ES</button>
+  </div>
+  <p class="toc-heading" data-i18n="contents">Contents</p>
+  <ul class="toc-list" id="toc"></ul>
+</nav>
 
-    <section id="purpose">
-      <h2>Purpose</h2>
-      <p>Built to give analysts a friction-free way to snapshot third-party API data without standing up an ETL pipeline. Replaces ad-hoc <code>curl | jq | sqlite3</code> shell scripts with a typed, testable Python flow.</p>
-    </section>
+<header>
+  <div id="breadcrumb">
+    <i data-lucide="map-pin" style="width:13px;height:13px;color:var(--fg-dim)"></i>
+    <span id="breadcrumb-text">Overview</span>
+  </div>
+  <div class="header-right">
+    <div class="search-wrap">
+      <i data-lucide="search" class="search-icon"></i>
+      <input type="search" id="search-input" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="color-picker-wrap">
+      <button class="color-dot-btn" id="color-trigger" title="Accent color" aria-label="Customize accent color">
+        <span class="color-dot-preview" id="color-dot-preview"></span>
+      </button>
+      <div class="color-popover glass" id="color-popover">
+        <div class="color-popover-label">
+          <i data-lucide="palette" style="width:13px;height:13px"></i>
+          <span data-i18n="accentColor">Accent</span>
+        </div>
+        <input type="color" id="color-input">
+        <button class="color-reset-btn" id="color-reset" data-i18n="reset">Reset</button>
+      </div>
+    </div>
+    <button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+      <i data-lucide="sun"  id="theme-icon-light" style="width:15px;height:15px;display:none"></i>
+      <i data-lucide="moon" id="theme-icon-dark"  style="width:15px;height:15px"></i>
+    </button>
+  </div>
+</header>
 
-    <section id="architecture">
-      <h2>Architecture</h2>
+<main>
+
+  <section id="hero">
+    <h1 class="hero-title">understand-repo</h1>
+    <div class="hero-meta">
+      <span class="badge badge-type">
+        <i data-lucide="layers" style="width:11px;height:11px"></i>
+        Skill / Library
+      </span>
+      <span class="badge badge-commit">
+        <i data-lucide="git-commit-horizontal" style="width:11px;height:11px"></i>
+        —
+      </span>
+      <span><span data-i18n="generated">Generated</span> 2026-05-20</span>
+    </div>
+  </section>
+
+  <div class="section-card glass" id="what-and-why">
+    <div class="section-header">
+      <i data-lucide="lightbulb" class="section-icon"></i>
+      <span class="section-title" data-i18n="whatAndWhy">What &amp; Why</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body"><p><strong>understand-repo</strong> is a Claude Code and Codex skill that analyzes any repository and generates a self-contained HTML study guide — a single file that gives a developer a complete mental model of an unfamiliar codebase in minutes.</p><p>It exists because reading a large codebase cold is slow and the insights get lost in chat. This skill produces a persistent, visual, interactive document: architecture diagram, annotated code excerpts, data-flow walkthrough, and extension points — all offline-ready and shareable.</p></div>
+  </div>
+
+  <div class="section-card glass" id="architecture">
+    <div class="section-header">
+      <i data-lucide="git-fork" class="section-icon"></i>
+      <span class="section-title" data-i18n="architecture">Architecture</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">
       <div class="mermaid">
 graph TD
-    User[User / Terminal] -->|invokes| CLI[cli.py: argparse entry]
-    CLI -->|parses args| Config[config.py: load settings]
-    CLI -->|dispatches| Commands{Command router}
-    Commands -->|fetch| Fetcher[fetcher.py: HTTP client]
-    Commands -->|transform| Parser[parser.py: data cleanup]
-    Commands -->|persist| Storage[storage.py: SQLite]
-    Fetcher -->|JSON| Parser
-    Parser --> Storage
-    Storage -->|read| Reporter[reporter.py: render output]
-    Reporter -->|stdout / file| User
+    U([User Prompt]) --> S[SKILL.md]
+    S --> E[1. Exploration Phase]
+    E --> ID[Identity Files]
+    ID --> A[2. Analysis Phase]
+    A --> DS{Documentation Score}
+    A --> CA[Centrality Analysis]
+    DS -->|HIGH| CPD[C+D Strategy]
+    DS -->|LOW| DG[D + Guardrails]
+    CPD --> EP[Extension Points]
+    DG --> EP
+    CA --> CD[Code Deep Dive]
+    EP --> T[study_guide_template.html]
+    CD --> T
+    T --> H[study_guide.html]
+    T --> M[architecture.mmd]
+    T --> SM[summary.md]
+    T --> IJ[index.json]
       </div>
-    </section>
+    </div>
+  </div>
 
-    <section id="step-by-step">
-      <h2>Step-by-Step Guide</h2>
-      <ol>
-        <li>User runs <code>sample-cli fetch --source github</code>.</li>
-        <li><code>cli.py</code> parses args with <code>argparse</code> and loads config via <code>config.py</code>.</li>
-        <li>The <code>fetch</code> command calls <code>fetcher.get(source)</code> which issues an HTTP request and returns raw JSON.</li>
-        <li><code>parser.normalize(payload)</code> flattens nested fields and coerces types.</li>
-        <li><code>storage.insert(rows)</code> writes to <code>~/.sample-cli/data.db</code> using <code>sqlite3</code>.</li>
-        <li>Running <code>sample-cli report</code> later calls <code>reporter.render()</code> which queries the DB and prints a formatted table.</li>
-      </ol>
-    </section>
+  <div class="section-card glass" id="how-it-works">
+    <div class="section-header">
+      <i data-lucide="workflow" class="section-icon"></i>
+      <span class="section-title" data-i18n="howItWorks">How it works</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body"><ol><li><strong>Read SKILL.md</strong> — the agent loads the instruction set, which defines every analysis step, placeholder contract, and output format.</li><li><strong>Scan the target repo</strong> — maps the file tree and reads identity files (<code>README</code>, <code>package.json</code>, <code>pyproject.toml</code>, etc.) in parallel to classify project type.</li><li><strong>Compute Documentation Score</strong> — evaluates README depth and comment density to choose the Extension Points strategy (C+D vs D-only).</li><li><strong>Centrality analysis</strong> — identifies the 3–5 files with highest import fan-in/fan-out; selects narrative fragments from them for Code Deep Dive.</li><li><strong>Load the HTML template</strong> — reads <code>templates/study_guide_template.html</code> and replaces all placeholder tokens with generated content.</li><li><strong>Write output artifacts</strong> — saves <code>study_guide.html</code>, <code>architecture.mmd</code>, <code>summary.md</code>, and <code>index.json</code> to <code>docs/</code>.</li></ol></div>
+  </div>
 
-    <section id="core-modules">
-      <h2>Core Modules</h2>
+  <div class="section-card glass" id="key-files">
+    <div class="section-header">
+      <i data-lucide="files" class="section-icon"></i>
+      <span class="section-title" data-i18n="keyFiles">Key Files</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">
       <table>
-        <thead><tr><th>File</th><th>Role</th></tr></thead>
-        <tbody>
-          <tr><td><code>cli.py</code></td><td>Entry point. Argparse setup and command dispatch.</td></tr>
-          <tr><td><code>config.py</code></td><td>Loads <code>~/.sample-cli/config.toml</code> with sensible defaults.</td></tr>
-          <tr><td><code>fetcher.py</code></td><td>Thin <code>httpx</code> wrapper with retry + timeout.</td></tr>
-          <tr><td><code>parser.py</code></td><td>Normalization rules per source. Pure functions.</td></tr>
-          <tr><td><code>storage.py</code></td><td>SQLite schema + insert/query helpers.</td></tr>
-          <tr><td><code>reporter.py</code></td><td>Renders query results as a rich table.</td></tr>
-        </tbody>
+        <thead><tr><th data-i18n="file">File</th><th data-i18n="role">Role</th></tr></thead>
+        <tbody id="key-files-tbody"><tr><td><code>SKILL.md</code></td><td>Core instruction set — defines every analysis step, placeholder contract, and output format.</td></tr><tr><td><code>templates/study_guide_template.html</code></td><td>LiquidGlass HTML template — CSS tokens, interactive JS, section structure, i18n, color picker, inline Lucide icons.</td></tr><tr><td><code>agents/openai.yaml</code></td><td>Codex agent configuration — enables implicit invocation and sets the default prompt.</td></tr><tr><td><code>README.md</code></td><td>Human-facing documentation — installation, usage, placeholders reference, and customization guide.</td></tr><tr><td><code>CONTEXT.md</code></td><td>Domain glossary — canonical terms consumed by the <code>grill-with-docs</code> skill.</td></tr></tbody>
       </table>
-    </section>
+    </div>
+  </div>
 
-    <section id="minimal-example">
-      <h2>Minimal Example</h2>
-      <pre><code class="language-bash">$ sample-cli fetch --source github --repo torvalds/linux
-Fetched 1 record · stored in ~/.sample-cli/data.db
+  <div class="section-card glass" id="code-deep-dive">
+    <div class="section-header">
+      <i data-lucide="code-2" class="section-icon"></i>
+      <span class="section-title" data-i18n="codeDeepDive">Code Deep Dive</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body"><div class="code-module" id="code-module-template"><div class="code-module-header"><i data-lucide="file-code-2" style="width:15px;height:15px;color:var(--accent)"></i><h3>templates/study_guide_template.html</h3></div><p class="module-role">Highest fan-out: every generated study guide is a copy of this file. The LiquidGlass visual system, inline Lucide icons, i18n, color picker, and all interactive behavior live here.</p><div class="code-wrap"><pre><code>.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--glass-border);
+}
+.glass::before {
+  /* Specular top-edge highlight (iOS LiquidGlass) */
+  top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent,
+    var(--glass-border-s), transparent);
+}</code></pre><button class="copy-btn"><i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">Copy</span></button></div></div><div class="code-module" id="code-module-skill"><div class="code-module-header"><i data-lucide="file-code-2" style="width:15px;height:15px;color:var(--accent)"></i><h3>SKILL.md — Documentation Score</h3></div><p class="module-role">Most-referenced file: every agent reads it first. The Documentation Score logic determines Extension Points quality.</p><div class="code-wrap"><pre><code>Documentation Score: HIGH if 2+ of these:
+  - README has Contributing/Extending/Customization section
+  - Source files contain @api, @public, // override comments
+  - Files named plugin.*, middleware.*, adapter.* exist
+  - CONTRIBUTING.md is present
 
-$ sample-cli report --last 1
-┌──────────────────┬─────────┬──────────┐
-│ repo             │ stars   │ forks    │
-├──────────────────┼─────────┼──────────┤
-│ torvalds/linux   │ 178432  │ 53120    │
-└──────────────────┴─────────┴──────────┘</code></pre>
-    </section>
+HIGH: heuristics + docs + LLM inference
+LOW:  LLM only, all points marked (inferred)</code></pre><button class="copy-btn"><i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">Copy</span></button></div></div></div>
+  </div>
 
-    <section id="local-setup">
-      <h2>Local Setup</h2>
-      <pre><code class="language-bash">git clone https://github.com/example/sample-cli.git
-cd sample-cli
-python -m venv .venv && source .venv/bin/activate
-pip install -e .
-sample-cli --help</code></pre>
-    </section>
+  <div class="section-card glass" id="extension-points">
+    <div class="section-header">
+      <i data-lucide="plug" class="section-icon"></i>
+      <span class="section-title" data-i18n="extensionPoints">Extension Points</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body"><div class="ext-point"><div class="ext-point-header"><i data-lucide="plug-2" style="width:15px;height:15px;color:var(--accent)"></i><h3>Template placeholders</h3></div><p>Add a new placeholder to <code>templates/study_guide_template.html</code> and a matching step in <code>SKILL.md</code> to introduce a new section without touching the JS.</p></div><div class="ext-point"><div class="ext-point-header"><i data-lucide="plug-2" style="width:15px;height:15px;color:var(--accent)"></i><h3>CSS theme tokens</h3></div><p>Override <code>--accent</code>, <code>--glass-bg</code>, <code>--orb-*</code> in the <code>[data-theme]</code> blocks, or use the built-in color picker in the header.</p></div><div class="ext-point"><div class="ext-point-header"><i data-lucide="plug-2" style="width:15px;height:15px;color:var(--accent)"></i><h3>Output directory</h3></div><p>Override at invocation time: <em>"generate the study guide into <code>wiki/</code> instead of <code>docs/</code>"</em>.</p></div><div class="ext-point"><div class="ext-point-header"><i data-lucide="plug-2" style="width:15px;height:15px;color:var(--accent)"></i><h3>Project type classifier</h3></div><p>Extend the type list in <code>SKILL.md</code> Step 1 to detect new categories (e.g. <em>Game Engine</em>, <em>Data Pipeline</em>).</p></div></div>
+  </div>
 
-    <footer>
-      <p>Generated by <a href="https://github.com/crosaless/understand-repo" style="color: var(--accent);">understand-repo</a> skill · 2026-05-17</p>
-    </footer>
-  </main>
+  <div class="section-card glass" id="try-it-now">
+    <div class="section-header">
+      <i data-lucide="play-circle" class="section-icon"></i>
+      <span class="section-title" data-i18n="tryItNow">Try it now</span>
+      <i data-lucide="chevron-down" class="section-chevron"></i>
+    </div>
+    <div class="section-body">
+      <h3 data-i18n="minimalExample">Minimal example</h3>
+      <div class="code-wrap">
+        <pre><code>git clone https://github.com/crosaless/understand-repo.git ~/.claude/skills/understand-repo
 
-  <script>
-    const toc = document.getElementById('toc');
-    document.querySelectorAll('main section[id]').forEach(sec => {
-      const h2 = sec.querySelector('h2');
-      if (!h2) return;
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = '#' + sec.id;
-      a.textContent = h2.textContent;
-      li.appendChild(a);
-      toc.appendChild(li);
+# From any project directory:
+# analyze this repo and generate a study guide</code></pre>
+        <button class="copy-btn"><i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">Copy</span></button>
+      </div>
+      <h3 data-i18n="localSetup">Local setup</h3>
+      <div class="code-wrap">
+        <pre><code># No build step — open directly in any browser:
+open docs/study_guide.html        # macOS
+start docs/study_guide.html       # Windows
+xdg-open docs/study_guide.html    # Linux</code></pre>
+        <button class="copy-btn"><i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">Copy</span></button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span><span data-i18n="generatedBy">Generated by</span> <a href="https://github.com/crosaless/understand-repo">understand-repo</a></span>
+    <span>2026-05-20</span>
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── i18n ───────────────────────────────────────────────── */
+  const LANGS = {
+    en: {
+      contents:      'Contents',
+      whatAndWhy:    'What & Why',
+      architecture:  'Architecture',
+      howItWorks:    'How it works',
+      keyFiles:      'Key Files',
+      codeDeepDive:  'Code Deep Dive',
+      extensionPoints: 'Extension Points',
+      tryItNow:      'Try it now',
+      file:          'File',
+      role:          'Role',
+      minimalExample:'Minimal example',
+      localSetup:    'Local setup',
+      copy:          'Copy',
+      copied:        'Copied',
+      generated:     'Generated',
+      generatedBy:   'Generated by',
+      accentColor:   'Accent',
+      reset:         'Reset',
+      toc: {
+        hero:             'Overview',
+        'what-and-why':   'What & Why',
+        architecture:     'Architecture',
+        'how-it-works':   'How it works',
+        'key-files':      'Key Files',
+        'code-deep-dive': 'Code Deep Dive',
+        'extension-points': 'Extension Points',
+        'try-it-now':     'Try it now',
+      }
+    },
+    es: {
+      contents:      'Contenido',
+      whatAndWhy:    'Qué y Por Qué',
+      architecture:  'Arquitectura',
+      howItWorks:    'Cómo funciona',
+      keyFiles:      'Archivos clave',
+      codeDeepDive:  'Código en profundidad',
+      extensionPoints: 'Puntos de extensión',
+      tryItNow:      'Probalo ahora',
+      file:          'Archivo',
+      role:          'Rol',
+      minimalExample:'Ejemplo mínimo',
+      localSetup:    'Setup local',
+      copy:          'Copiar',
+      copied:        'Copiado',
+      generated:     'Generado',
+      generatedBy:   'Generado por',
+      accentColor:   'Acento',
+      reset:         'Restablecer',
+      toc: {
+        hero:             'Resumen',
+        'what-and-why':   'Qué y Por Qué',
+        architecture:     'Arquitectura',
+        'how-it-works':   'Cómo funciona',
+        'key-files':      'Archivos clave',
+        'code-deep-dive': 'Código en profundidad',
+        'extension-points': 'Puntos de extensión',
+        'try-it-now':     'Probalo ahora',
+      }
+    }
+  };
+
+  let currentLang = document.documentElement.getAttribute('data-lang') || 'en';
+  if (!LANGS[currentLang]) currentLang = 'en';
+
+  function applyLang(lang) {
+    if (!LANGS[lang]) return;
+    currentLang = lang;
+    document.documentElement.setAttribute('data-lang', lang);
+    localStorage.setItem('guideLang', lang);
+    const t = LANGS[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] != null) el.textContent = t[key];
     });
-    const links = toc.querySelectorAll('a');
-    const sections = document.querySelectorAll('main section[id]');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
-        }
+    document.querySelectorAll('.toc-link[data-sid]').forEach(link => {
+      const sid = link.dataset.sid;
+      const label = t.toc[sid];
+      if (label) {
+        const span = link.querySelector('span');
+        if (span) span.textContent = label;
+      }
+    });
+    const breadText = document.getElementById('breadcrumb-text');
+    const active = document.querySelector('.toc-link.active');
+    if (active && breadText) breadText.textContent = t.toc[active.dataset.sid] || breadText.textContent;
+    document.querySelectorAll('.section-title[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+    const si = document.getElementById('search-input');
+    if (si) si.placeholder = lang === 'es' ? 'Buscar en la guía…' : 'Search guide…';
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
+  applyLang(currentLang);
+
+  /* ── Theme + Color picker vars (declared together — updateColorDot needs them) */
+  const root         = document.documentElement;
+  const iconLight    = document.getElementById('theme-icon-light');
+  const iconDark     = document.getElementById('theme-icon-dark');
+  const hljsTheme    = document.getElementById('hljs-theme');
+  const colorTrigger = document.getElementById('color-trigger');
+  const colorPopover = document.getElementById('color-popover');
+  const colorInput   = document.getElementById('color-input');
+  const colorDot     = document.getElementById('color-dot-preview');
+  const colorReset   = document.getElementById('color-reset');
+
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    iconLight.style.display = t === 'light' ? 'block' : 'none';
+    iconDark.style.display  = t === 'dark'  ? 'block' : 'none';
+    if (hljsTheme) hljsTheme.href = t === 'light'
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css'
+      : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+    updateColorDot();
+  }
+  const savedTheme = localStorage.getItem('theme');
+  const sysTheme   = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  applyTheme(savedTheme || sysTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ── Color picker ───────────────────────────────────────── */
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return { r, g, b };
+  }
+
+  function setCustomAccent(hex) {
+    root.style.setProperty('--accent', hex);
+    const { r, g, b } = hexToRgb(hex);
+    const r2 = Math.round(r * 0.6 + 100 * 0.4);
+    const g2 = Math.round(g * 0.6 + 100 * 0.4);
+    const b2 = Math.round(b * 0.6 + 110 * 0.4);
+    root.style.setProperty('--accent-2', `rgb(${r2},${g2},${b2})`);
+    localStorage.setItem('accentColor', hex);
+    updateColorDot();
+  }
+
+  function updateColorDot() {
+    const c = getComputedStyle(root).getPropertyValue('--accent').trim();
+    if (colorDot) colorDot.style.background = c;
+    if (colorInput) {
+      const stored = localStorage.getItem('accentColor');
+      if (stored) colorInput.value = stored;
+    }
+  }
+
+  function resetAccent() {
+    root.style.removeProperty('--accent');
+    root.style.removeProperty('--accent-2');
+    localStorage.removeItem('accentColor');
+    setTimeout(updateColorDot, 10);
+  }
+
+  const savedAccent = localStorage.getItem('accentColor');
+  if (savedAccent) { root.style.setProperty('--accent', savedAccent); }
+  updateColorDot();
+
+  colorTrigger?.addEventListener('click', e => {
+    e.stopPropagation();
+    colorPopover.classList.toggle('open');
+    if (window.lucide) lucide.createIcons({ nodes: [colorPopover] });
+  });
+  document.addEventListener('click', e => {
+    if (!colorTrigger?.contains(e.target) && !colorPopover?.contains(e.target)) {
+      colorPopover?.classList.remove('open');
+    }
+  });
+  colorInput?.addEventListener('input', () => setCustomAccent(colorInput.value));
+  colorReset?.addEventListener('click', () => { resetAccent(); colorPopover?.classList.remove('open'); });
+
+  /* ── Progress bar ───────────────────────────────────────── */
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = max > 0 ? (window.scrollY / max * 100) + '%' : '100%';
+  }, { passive: true });
+
+  /* ── TOC ────────────────────────────────────────────────── */
+  const TOC_DEFS = [
+    { id: 'hero',             icon: 'home'          },
+    { id: 'what-and-why',     icon: 'lightbulb'     },
+    { id: 'architecture',     icon: 'git-fork'      },
+    { id: 'how-it-works',     icon: 'workflow'      },
+    { id: 'key-files',        icon: 'files',        subs: { sel: '#key-files-tbody tr', label: r => r.querySelector('td')?.textContent?.trim() } },
+    { id: 'code-deep-dive',   icon: 'code-2',       subs: { sel: '.code-module',        label: m => m.querySelector('h3')?.textContent?.trim() } },
+    { id: 'extension-points', icon: 'plug'          },
+    { id: 'try-it-now',       icon: 'play-circle'   },
+  ];
+
+  const tocEl      = document.getElementById('toc');
+  const breadcrumb = document.getElementById('breadcrumb-text');
+
+  TOC_DEFS.forEach(def => {
+    const li = document.createElement('li');
+    const a  = document.createElement('a');
+    a.className = 'toc-link'; a.dataset.sid = def.id; a.href = '#' + def.id;
+    const t = LANGS[currentLang];
+    a.innerHTML = `<i data-lucide="${def.icon}" class="toc-icon"></i><span>${t.toc[def.id] || def.id}</span>`;
+
+    if (def.subs) {
+      const chev = document.createElement('i');
+      chev.setAttribute('data-lucide', 'chevron-right'); chev.className = 'toc-chevron';
+      a.appendChild(chev);
+      const sub = document.createElement('ul'); sub.className = 'toc-sub';
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById(def.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        a.classList.toggle('open'); sub.classList.toggle('open');
       });
-    }, { rootMargin: '-30% 0px -60% 0px' });
-    sections.forEach(s => observer.observe(s));
-    if (window.hljs) window.addEventListener('load', () => hljs.highlightAll());
-  </script>
+      setTimeout(() => {
+        document.querySelectorAll(def.subs.sel).forEach((el, i) => {
+          const lbl = def.subs.label(el); if (!lbl) return;
+          const slug = el.id || (def.id + '-sub-' + i); if (!el.id) el.id = slug;
+          const sli = document.createElement('li'); const sa = document.createElement('a');
+          sa.href = '#' + slug;
+          sa.innerHTML = `<i data-lucide="file-code-2" style="width:11px;height:11px"></i>${lbl}`;
+          sli.appendChild(sa); sub.appendChild(sli);
+        });
+        if (window.lucide) lucide.createIcons({ nodes: [sub] });
+      }, 300);
+      li.appendChild(a); li.appendChild(sub);
+    } else {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById(def.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+    }
+    tocEl.appendChild(li);
+  });
+
+  /* ── Scrollspy ──────────────────────────────────────────── */
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const id = e.target.id;
+      document.querySelectorAll('.toc-link').forEach(l => l.classList.toggle('active', l.dataset.sid === id));
+      const t = LANGS[currentLang];
+      if (breadcrumb && t.toc[id]) breadcrumb.textContent = t.toc[id];
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  TOC_DEFS.map(d => document.getElementById(d.id)).filter(Boolean).forEach(s => spy.observe(s));
+
+  /* ── Collapsible ────────────────────────────────────────── */
+  document.querySelectorAll('.section-header').forEach(hdr => {
+    hdr.addEventListener('click', () => hdr.closest('.section-card')?.classList.toggle('collapsed'));
+  });
+
+  /* ── Copy to clipboard ──────────────────────────────────── */
+  function wireBtn(btn) {
+    const pre = btn.closest('.code-wrap')?.querySelector('pre'); if (!pre) return;
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(pre.textContent || '').then(() => {
+        btn.classList.add('copied');
+        const span = btn.querySelector('[data-i18n="copy"]');
+        const orig = span?.textContent;
+        if (span) span.textContent = LANGS[currentLang].copied;
+        btn.querySelector('i')?.setAttribute('data-lucide', 'check');
+        if (window.lucide) lucide.createIcons({ nodes: [btn] });
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (span) span.textContent = LANGS[currentLang].copy;
+          btn.querySelector('i')?.setAttribute('data-lucide', 'copy');
+          if (window.lucide) lucide.createIcons({ nodes: [btn] });
+        }, 2000);
+      });
+    });
+  }
+  document.querySelectorAll('pre').forEach(pre => {
+    if (pre.closest('.code-wrap')) { wireBtn(pre.closest('.code-wrap').querySelector('.copy-btn')); return; }
+    const wrap = document.createElement('div'); wrap.className = 'code-wrap';
+    pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+    const btn = document.createElement('button'); btn.className = 'copy-btn';
+    btn.innerHTML = `<i data-lucide="copy" style="width:11px;height:11px"></i> <span data-i18n="copy">${LANGS[currentLang].copy}</span>`;
+    wrap.appendChild(btn); wireBtn(btn);
+  });
+
+  /* ── Search ─────────────────────────────────────────────── */
+  const searchEl = document.getElementById('search-input');
+  searchEl?.addEventListener('input', () => {
+    const q = searchEl.value.trim().toLowerCase();
+    document.querySelectorAll('mark.search-hl').forEach(m => m.replaceWith(document.createTextNode(m.textContent)));
+    document.querySelectorAll('.section-card').forEach(card => {
+      if (!q) { card.classList.remove('search-hidden', 'collapsed'); return; }
+      card.classList.toggle('search-hidden', !card.textContent.toLowerCase().includes(q));
+      if (!card.classList.contains('search-hidden')) card.classList.remove('collapsed');
+    });
+  });
+
+  /* ── Init ───────────────────────────────────────────────── */
+  window.addEventListener('load', () => {
+    if (window.hljs) document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    if (window.lucide) lucide.createIcons();
+    updateColorDot();
+  });
+})();
+</script>
 </body>
 </html>
